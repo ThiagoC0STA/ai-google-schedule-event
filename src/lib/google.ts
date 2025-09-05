@@ -45,7 +45,7 @@ export async function getCalendar() {
         scopes: ["https://www.googleapis.com/auth/calendar"],
       });
 
-      const authClient = await auth.getClient();
+      const authClient: any = await auth.getClient();
       return google.calendar({ version: "v3", auth: authClient });
     }
 
