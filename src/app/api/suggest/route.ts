@@ -27,7 +27,7 @@ const suggestSchema = z.object({
     .default([9, 18]),
   bufferMin: z.number().min(0).max(60).default(10),
   calendarId: z.string().default("primary"),
-  tz: z.string().default(process.env.TZ || DEFAULT_TZ),
+  tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
   maxSuggestions: z.number().min(1).max(10).default(5),
 });
 

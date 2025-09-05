@@ -18,7 +18,7 @@ const bookSchema = z.object({
   title: z.string().default("Call Bland AI"),
   description: z.string().nullable().optional(),
   calendarId: z.string().default("primary"),
-  tz: z.string().default(process.env.TZ || DEFAULT_TZ),
+  tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
   recheck: z.boolean().default(true),
 });
 

@@ -24,7 +24,7 @@ const availabilitySchema = z.object({
     .default([9, 18]),
   bufferMin: z.number().min(0).max(60).default(10),
   calendarId: z.string().default("primary"),
-  tz: z.string().default(process.env.TZ || DEFAULT_TZ),
+  tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
 });
 
 export async function POST(request: NextRequest) {

@@ -10,10 +10,10 @@
  */
 export function requireApiKey(request: Request): void {
   const apiKey = request.headers.get("x-api-key");
-  const expectedKey = process.env.INTERNAL_API_KEY;
+  const expectedKey = process.env.API_SECRET_KEY;
 
   if (!expectedKey) {
-    throw new Error("INTERNAL_API_KEY not configured");
+    throw new Error("API_SECRET_KEY not configured");
   }
 
   if (!apiKey || apiKey !== expectedKey) {
