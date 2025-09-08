@@ -19,9 +19,8 @@ import { z } from "zod";
 // Request body validation schema
 const suggestSchema = z.object({
   requestedStartISO: z.string(),
-  requestedEndISO: z.string(),
   days: z.number().min(1).max(30).default(7),
-  durationMin: z.number().min(15).max(480).default(45),
+  durationMin: z.number().min(15).max(480).default(30),
   workHours: z
     .tuple([z.number().min(0).max(23), z.number().min(0).max(23)])
     .default([9, 18]),
@@ -42,7 +41,6 @@ export async function POST(request: NextRequest) {
 
     const {
       requestedStartISO,
-      requestedEndISO,
       days,
       durationMin,
       workHours,
@@ -52,17 +50,9 @@ export async function POST(request: NextRequest) {
       maxSuggestions,
     } = validatedData;
 
-    // Parse requested times
+    // Parse requested time and calculate end time (30 minutes later)
     const requestedStart = toDateTime(requestedStartISO, tz);
-    const requestedEnd = toDateTime(requestedEndISO, tz);
-
-    // Validate time order
-    if (requestedStart >= requestedEnd) {
-      return NextResponse.json(
-        { error: "Requested start time must be before end time" },
-        { status: 400 }
-      );
-    }
+    const requestedEnd = requestedStart.plus({ minutes: durationMin });
 
     // Get current time in specified timezone
     const currentTime = now(tz);
@@ -133,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       requestedTime: {
         start: requestedStartISO,
-        end: requestedEndISO,
+        end: toISOString(requestedEnd),
       },
       timeZone: tz,
       suggestions: slots,
