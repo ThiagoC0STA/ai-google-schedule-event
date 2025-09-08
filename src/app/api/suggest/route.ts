@@ -19,15 +19,12 @@ import { z } from "zod";
 // Request body validation schema
 const suggestSchema = z.object({
   requestedStartISO: z.string(),
-  days: z.number().min(1).max(30).default(7),
-  durationMin: z.number().min(15).max(480).default(30),
   workHours: z
     .tuple([z.number().min(0).max(23), z.number().min(0).max(23)])
     .default([9, 18]),
   bufferMin: z.number().min(0).max(60).default(10),
   calendarId: z.string().default("primary"),
   tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
-  maxSuggestions: z.number().min(1).max(10).default(5),
 });
 
 export async function POST(request: NextRequest) {
@@ -39,24 +36,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = suggestSchema.parse(body);
 
-    const {
-      requestedStartISO,
-      days,
-      durationMin,
-      workHours,
-      bufferMin,
-      calendarId,
-      tz,
-      maxSuggestions,
-    } = validatedData;
+    const { requestedStartISO, workHours, bufferMin, calendarId, tz } =
+      validatedData;
 
     // Parse requested time and calculate end time (30 minutes later)
     const requestedStart = toDateTime(requestedStartISO, tz);
-    const requestedEnd = requestedStart.plus({ minutes: durationMin });
+    const requestedEnd = requestedStart.plus({ minutes: 30 });
 
     // Get current time in specified timezone
     const currentTime = now(tz);
-    const timeMax = currentTime.plus({ days });
+    const timeMax = currentTime.plus({ days: 30 }); // Buscar por 30 dias
 
     // Get Google Calendar client
     const calendar = await getCalendar();
@@ -77,9 +66,9 @@ export async function POST(request: NextRequest) {
     // Generate all possible slots for the specified period
     const allSlots = generateMultiDaySlots(
       currentTime.startOf("day"),
-      days,
+      30, // 30 dias fixo
       workHours,
-      durationMin,
+      30, // 30 minutos fixo
       bufferMin
     );
 
@@ -110,14 +99,14 @@ export async function POST(request: NextRequest) {
       return aDistance - bDistance;
     });
 
-    // Take first N suggestions
-    const suggestions = sortedSlots.slice(0, maxSuggestions);
+    // Take first 5 suggestions (sempre 5)
+    const suggestions = sortedSlots.slice(0, 5);
 
     // Format response
     const slots = suggestions.map((slot) => ({
       start: toISOString(slot.start!),
       end: toISOString(slot.end!),
-      duration: durationMin,
+      duration: 30, // 30 minutos fixo
     }));
 
     return NextResponse.json({

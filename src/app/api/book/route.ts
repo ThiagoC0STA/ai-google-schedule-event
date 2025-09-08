@@ -13,7 +13,6 @@ import { z } from "zod";
 // Request body validation schema
 const bookSchema = z.object({
   startISO: z.string(),
-  endISO: z.string(),
   attendeeEmail: z.string().email().nullable().optional(),
   title: z.string().default("Call Bland AI"),
   description: z.string().nullable().optional(),
@@ -33,7 +32,6 @@ export async function POST(request: NextRequest) {
 
     const {
       startISO,
-      endISO,
       attendeeEmail,
       title,
       description,
@@ -42,17 +40,9 @@ export async function POST(request: NextRequest) {
       recheck,
     } = validatedData;
 
-    // Parse start and end times
+    // Parse start time and calculate end time (30 minutes later)
     const startTime = toDateTime(startISO, tz);
-    const endTime = toDateTime(endISO, tz);
-
-    // Validate time order
-    if (startTime >= endTime) {
-      return NextResponse.json(
-        { error: "Start time must be before end time" },
-        { status: 400 }
-      );
-    }
+    const endTime = startTime.plus({ minutes: 30 });
 
     // Get Google Calendar client
     const calendar = await getCalendar();
