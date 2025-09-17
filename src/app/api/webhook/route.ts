@@ -23,12 +23,14 @@ export async function POST(request: NextRequest) {
 
     console.log("Webhook received data:", validatedData);
 
-    // For now, just return the received data (without calling Bland AI)
+    // Initiate conversation with Bland AI
+    const blandAIResponse = await initiateBlandAIConversation(validatedData);
 
     return NextResponse.json({
       success: true,
-      message: "Data received successfully",
+      message: "Conversation initiated with Bland AI",
       data: validatedData,
+      blandAI: blandAIResponse,
     });
   } catch (error) {
     console.error("Webhook error:", error);
