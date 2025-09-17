@@ -23,7 +23,11 @@ const suggestSchema = z.object({
     .tuple([z.number().min(0).max(23), z.number().min(0).max(23)])
     .default([9, 18]),
   bufferMin: z.number().min(0).max(60).default(10),
-  calendarId: z.string().default("primary"),
+  calendarId: z
+    .string()
+    .default(
+      "c_38c39f72ffd161460d8166a7fc705488275ac62ffb3c7471af98bf900e17c24e@group.calendar.google.com"
+    ),
   tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
 });
 

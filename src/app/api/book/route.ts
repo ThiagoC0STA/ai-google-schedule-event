@@ -16,7 +16,11 @@ const bookSchema = z.object({
   attendeeEmail: z.string().email().nullable().optional(),
   title: z.string().default("Call Bland AI"),
   description: z.string().nullable().optional(),
-  calendarId: z.string().default("primary"),
+  calendarId: z
+    .string()
+    .default(
+      "c_38c39f72ffd161460d8166a7fc705488275ac62ffb3c7471af98bf900e17c24e@group.calendar.google.com"
+    ),
   tz: z.string().default(process.env.TIMEZONE || DEFAULT_TZ),
   recheck: z.boolean().default(true),
 });
