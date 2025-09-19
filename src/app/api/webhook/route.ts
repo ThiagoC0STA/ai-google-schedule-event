@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         data: validatedData,
         blandAI: blandAIResponse,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Bland AI Error:", error);
       return NextResponse.json({
         success: false,
