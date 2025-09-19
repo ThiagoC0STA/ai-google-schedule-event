@@ -12,7 +12,7 @@ import { z } from "zod";
 
 // Request body validation schema
 const bookSchema = z.object({
-  startISO: z.string(),
+  startISO: z.string().transform((val) => val.replace(/Z$/, "")),
   attendeeEmail: z.string().email().nullable().optional(),
   title: z.string().default("Call Bland AI"),
   description: z.string().nullable().optional(),
