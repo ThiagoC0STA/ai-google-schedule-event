@@ -18,7 +18,7 @@ import { z } from "zod";
 
 // Request body validation schema
 const suggestSchema = z.object({
-  requestedStartISO: z.string(),
+  requestedStartISO: z.string().transform((val) => val.replace(/Z$/, "")),
   workHours: z
     .tuple([z.number().min(0).max(23), z.number().min(0).max(23)])
     .default([9, 18]),
