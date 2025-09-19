@@ -25,6 +25,8 @@ const bookSchema = z.object({
   recheck: z.boolean().default(true),
 });
 
+console.log("BOOK API - Request received" + bookSchema.toString());
+
 export async function POST(request: NextRequest) {
   try {
     // Validate API key
@@ -32,7 +34,16 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
+    console.log(
+      "📥 BOOK API - Raw request body:",
+      JSON.stringify(body, null, 2)
+    );
+
     const validatedData = bookSchema.parse(body);
+    console.log(
+      "✅ BOOK API - Validated data:",
+      JSON.stringify(validatedData, null, 2)
+    );
 
     const {
       startISO,
@@ -44,9 +55,23 @@ export async function POST(request: NextRequest) {
       recheck,
     } = validatedData;
 
+    console.log("🌍 BOOK API - Timezone info:");
+    console.log("  - process.env.TIMEZONE:", process.env.TIMEZONE);
+    console.log("  - DEFAULT_TZ:", DEFAULT_TZ);
+    console.log("  - Final tz used:", tz);
+    console.log("  - startISO received:", startISO);
+
     // Parse start time and calculate end time (30 minutes later)
     const startTime = toDateTime(startISO, tz);
     const endTime = startTime.plus({ minutes: 30 });
+
+    console.log("⏰ BOOK API - Time processing:");
+    console.log("  - startTime.toISO():", startTime.toISO());
+    console.log("  - startTime.toString():", startTime.toString());
+    console.log("  - startTime.zoneName:", startTime.zoneName);
+    console.log("  - endTime.toISO():", endTime.toISO());
+    console.log("  - endTime.toString():", endTime.toString());
+    console.log("  - endTime.zoneName:", endTime.zoneName);
 
     // Get Google Calendar client
     const calendar = await getCalendar();
@@ -124,6 +149,14 @@ export async function POST(request: NextRequest) {
       },
       conferenceDataVersion: 1,
     };
+
+    console.log("📅 BOOK API - Event data to be created:");
+    console.log("  - Event summary:", eventData.summary);
+    console.log("  - Start dateTime:", eventData.start.dateTime);
+    console.log("  - Start timeZone:", eventData.start.timeZone);
+    console.log("  - End dateTime:", eventData.end.dateTime);
+    console.log("  - End timeZone:", eventData.end.timeZone);
+    console.log("  - Calendar ID:", calendarId);
 
     // Add attendee if provided
     if (attendeeEmail) {
