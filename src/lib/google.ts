@@ -6,7 +6,7 @@
 import { google } from "googleapis";
 
 // Default timezone
-export const DEFAULT_TZ = "America/Sao_Paulo";
+export const DEFAULT_TZ = process.env.TIMEZONE || "America/Los_Angeles";
 
 /**
  * Get Google Calendar client with appropriate authentication

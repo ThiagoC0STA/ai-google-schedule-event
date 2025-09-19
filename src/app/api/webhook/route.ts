@@ -23,15 +23,33 @@ export async function POST(request: NextRequest) {
 
     console.log("Webhook received data:", validatedData);
 
-    // Initiate conversation with Bland AI
-    const blandAIResponse = await initiateBlandAIConversation(validatedData);
+    // Test Bland AI call
+    console.log("Testing Bland AI call...");
+    console.log("PATHWAYID:", process.env.PATHWAYID);
+    console.log(
+      "BLANDAPIKEY:",
+      process.env.BLANDAPIKEY ? "Present" : "Missing"
+    );
 
-    return NextResponse.json({
-      success: true,
-      message: "Conversation initiated with Bland AI",
-      data: validatedData,
-      blandAI: blandAIResponse,
-    });
+    try {
+      const blandAIResponse = await initiateBlandAIConversation(validatedData);
+      console.log("Bland AI Response:", blandAIResponse);
+
+      return NextResponse.json({
+        success: true,
+        message: "Conversation initiated with Bland AI",
+        data: validatedData,
+        blandAI: blandAIResponse,
+      });
+    } catch (error) {
+      console.error("Bland AI Error:", error);
+      return NextResponse.json({
+        success: false,
+        message: "Error calling Bland AI",
+        error: error.message,
+        data: validatedData,
+      });
+    }
   } catch (error) {
     console.error("Webhook error:", error);
 
@@ -63,8 +81,7 @@ async function initiateBlandAIConversation(data: any) {
     // Data to send to Bland AI
     const blandAIData = {
       phone_number: data.phone_number,
-      task: "Schedule consultation with Facebook lead",
-      voice: "mason",
+      pathway_id: process.env.PATHWAYID,
       request_data: {
         lead_name: data.lead_name,
         lead_email: data.lead_email,
